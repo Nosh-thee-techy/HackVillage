@@ -1,11 +1,5 @@
-import { LandingHero } from "@/components/landing/LandingHero";
-import { PrizeVerificationSection } from "@/components/landing/PrizeVerificationSection";
+import { LandingPage } from "@/components/landing/LandingPage";
 
 export default function HomePage() {
-  return (
-    <>
-      <LandingHero />
-      <PrizeVerificationSection />
-    </>
-  );
+  return <LandingPage />;
 }
