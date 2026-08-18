@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { LandingMorphModel } from "@/components/landing/LandingMorphModel";
 
+type StoryLayout = "left" | "center" | "right";
+
 const STORIES: {
   id: string;
   eyebrow: string;
@@ -11,6 +13,7 @@ const STORIES: {
   body: string;
   bullets: string[];
   modelLabel: string;
+  layout: StoryLayout;
   link?: { label: string; href: string };
 }[] = [
   {
@@ -24,6 +27,7 @@ const STORIES: {
       "Prize-verified public discovery",
     ],
     modelLabel: "Role-aware network",
+    layout: "left",
     link: { label: "Open organizer workspace", href: "/organizer" },
   },
   {
@@ -37,6 +41,7 @@ const STORIES: {
       "Every state transition auditable",
     ],
     modelLabel: "Escrow prize vault",
+    layout: "center",
   },
   {
     id: "builders",
@@ -49,6 +54,7 @@ const STORIES: {
       "Structured judge endorsements",
     ],
     modelLabel: "Verified skill record",
+    layout: "right",
     link: { label: "Browse verified events", href: "/events" },
   },
   {
@@ -62,6 +68,7 @@ const STORIES: {
       "A foundation for career introductions",
     ],
     modelLabel: "Builder growth pathway",
+    layout: "center",
   },
 ];
 
@@ -103,6 +110,7 @@ export function LandingScrollStory() {
         <LandingMorphModel
           activeIndex={activeIndex}
           modelLabel={STORIES[activeIndex]?.modelLabel ?? STORIES[0].modelLabel}
+          position={STORIES[activeIndex]?.layout ?? STORIES[0].layout}
         />
       ) : null}
       {STORIES.map((story, index) => (
@@ -110,7 +118,6 @@ export function LandingScrollStory() {
           key={story.id}
           story={story}
           index={index}
-          modelOnLeft={index % 2 === 0}
           onActivate={setActiveIndex}
         />
       ))}
@@ -121,12 +128,10 @@ export function LandingScrollStory() {
 function StorySection({
   story,
   index,
-  modelOnLeft,
   onActivate,
 }: {
   story: (typeof STORIES)[number];
   index: number;
-  modelOnLeft: boolean;
   onActivate: (index: number) => void;
 }) {
   const sectionRef = useRef<HTMLElement>(null);
@@ -152,33 +157,75 @@ function StorySection({
     <section
       ref={sectionRef}
       id={story.id}
-      className={`landing-story-section${modelOnLeft ? " landing-story-section--model-left" : " landing-story-section--model-right"}${visible ? " is-visible" : ""}`}
+      className={`landing-story-section landing-story-section--model-${story.layout}${visible ? " is-visible" : ""}`}
       aria-labelledby={`${story.id}-title`}
     >
       <div className="landing-container landing-story-grid">
-        <div className="landing-story-spacer" aria-hidden="true" />
-
-        <div className="landing-story-copy">
-          <p className="landing-section-eyebrow">{story.eyebrow}</p>
-          <h2 id={`${story.id}-title`}>{story.title}</h2>
-          <p>{story.body}</p>
-          <ul>
-            {story.bullets.map((bullet) => (
-              <li key={bullet}>
-                <CheckIcon />
-                {bullet}
-              </li>
-            ))}
-          </ul>
-          {story.link ? (
-            <Link className="landing-text-link" href={story.link.href}>
-              {story.link.label}
-              <ArrowIcon />
-            </Link>
-          ) : null}
-        </div>
+        {story.layout === "center" ? (
+          <>
+            <StoryIntroduction story={story} />
+            <div className="landing-story-spacer" aria-hidden="true" />
+            <StoryDetails story={story} />
+          </>
+        ) : (
+          <>
+            <div className="landing-story-spacer" aria-hidden="true" />
+            <div className="landing-story-copy">
+              <StoryIntroductionContent story={story} />
+              <StoryDetailsContent story={story} />
+            </div>
+          </>
+        )}
       </div>
     </section>
+  );
+}
+
+function StoryIntroduction({ story }: { story: (typeof STORIES)[number] }) {
+  return (
+    <div className="landing-story-copy landing-story-copy--primary">
+      <StoryIntroductionContent story={story} />
+    </div>
+  );
+}
+
+function StoryIntroductionContent({ story }: { story: (typeof STORIES)[number] }) {
+  return (
+    <>
+      <p className="landing-section-eyebrow">{story.eyebrow}</p>
+      <h2 id={`${story.id}-title`}>{story.title}</h2>
+      <p>{story.body}</p>
+    </>
+  );
+}
+
+function StoryDetails({ story }: { story: (typeof STORIES)[number] }) {
+  return (
+    <div className="landing-story-copy landing-story-copy--details">
+      <p className="landing-section-eyebrow">What this unlocks</p>
+      <StoryDetailsContent story={story} />
+    </div>
+  );
+}
+
+function StoryDetailsContent({ story }: { story: (typeof STORIES)[number] }) {
+  return (
+    <>
+      <ul>
+        {story.bullets.map((bullet) => (
+          <li key={bullet}>
+            <CheckIcon />
+            {bullet}
+          </li>
+        ))}
+      </ul>
+      {story.link ? (
+        <Link className="landing-text-link" href={story.link.href}>
+          {story.link.label}
+          <ArrowIcon />
+        </Link>
+      ) : null}
+    </>
   );
 }
 

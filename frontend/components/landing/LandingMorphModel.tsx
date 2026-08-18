@@ -9,16 +9,16 @@ const PARTICLE_COUNT = 2400;
 export function LandingMorphModel({
   activeIndex,
   modelLabel,
+  position,
 }: {
   activeIndex: number;
   modelLabel: string;
+  position: "left" | "center" | "right";
 }) {
-  const side = activeIndex % 2 === 0 ? "left" : "right";
-
   return (
     <div className="landing-morph-rail" aria-hidden="true">
       <div className="landing-morph-sticky">
-        <div className={`landing-morph-window landing-morph-window--${side}`}>
+        <div className={`landing-morph-window landing-morph-window--${position}`}>
           <div className="landing-story-glow" />
           <div className="landing-morph-canvas">
             <Canvas camera={{ fov: 42, position: [0, 0, 7.2] }} dpr={[1, 1.5]}>
